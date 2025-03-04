@@ -1,0 +1,223 @@
+---------------------------------------------------------------------------
+UnexpectedCharacters                      Traceback (most recent call last)
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/lark/lexer.py:665, in ContextualLexer.lex(self, lexer_state, parser_state)
+    664         lexer = self.lexers[parser_state.position]
+--> 665         yield lexer.next_token(lexer_state, parser_state)
+    666 except EOFError:
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/lark/lexer.py:598, in BasicLexer.next_token(self, lex_state, parser_state)
+    597         allowed = {"<END-OF-FILE>"}
+--> 598     raise UnexpectedCharacters(lex_state.text, line_ctr.char_pos, line_ctr.line, line_ctr.column,
+    599                                allowed=allowed, token_history=lex_state.last_token and [lex_state.last_token],
+    600                                state=parser_state, terminals_by_name=self.terminals_by_name)
+    602 value, type_ = res
+
+UnexpectedCharacters: No terminal matches 'a' in the current parser context, at line 1 col 76
+
+angchain_tutorials/covered topics.pdf") and eq("page", 3)
+                                        ^
+Expected one of: 
+	* RPAR
+	* COMMA
+	* RSQB
+
+Previous tokens: Token('RPAR', ')')
+
+
+During handling of the above exception, another exception occurred:
+
+UnexpectedToken                           Traceback (most recent call last)
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/langchain/chains/query_constructor/base.py:58, in StructuredQueryOutputParser.parse(self, text)
+     57 else:
+---> 58     parsed["filter"] = self.ast_parse(parsed["filter"])
+     59 if not parsed.get("limit"):
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/lark/lark.py:655, in Lark.parse(self, text, start, on_error)
+    638 """Parse the given text, according to the options provided.
+    639 
+    640 Parameters:
+   (...)
+    653 
+    654 """
+--> 655 return self.parser.parse(text, start=start, on_error=on_error)
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/lark/parser_frontends.py:104, in ParsingFrontend.parse(self, text, start, on_error)
+    103 stream = self._make_lexer_thread(text)
+--> 104 return self.parser.parse(stream, chosen_start, **kw)
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/lark/parsers/lalr_parser.py:42, in LALR_Parser.parse(self, lexer, start, on_error)
+     41 try:
+---> 42     return self.parser.parse(lexer, start)
+     43 except UnexpectedInput as e:
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/lark/parsers/lalr_parser.py:88, in _Parser.parse(self, lexer, start, value_stack, state_stack, start_interactive)
+     87     return InteractiveParser(self, parser_state, parser_state.lexer)
+---> 88 return self.parse_from_state(parser_state)
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/lark/parsers/lalr_parser.py:111, in _Parser.parse_from_state(self, state, last_token)
+    110         pass
+--> 111     raise e
+    112 except Exception as e:
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/lark/parsers/lalr_parser.py:100, in _Parser.parse_from_state(self, state, last_token)
+     99 token = last_token
+--> 100 for token in state.lexer.lex(state):
+    101     assert token is not None
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/lark/lexer.py:674, in ContextualLexer.lex(self, lexer_state, parser_state)
+    673     token = self.root_lexer.next_token(lexer_state, parser_state)
+--> 674     raise UnexpectedToken(token, e.allowed, state=parser_state, token_history=[last_token], terminals_by_name=self.root_lexer.terminals_by_name)
+    675 except UnexpectedCharacters:
+
+UnexpectedToken: Unexpected token Token('CNAME', 'and') at line 1, column 76.
+Expected one of: 
+	* $END
+Previous tokens: [Token('RPAR', ')')]
+
+
+During handling of the above exception, another exception occurred:
+
+OutputParserException                     Traceback (most recent call last)
+Cell In[24], line 1
+----> 1 docs = retriever.get_relevant_documents(question)
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/langchain_core/_api/deprecation.py:181, in deprecated.<locals>.deprecate.<locals>.warning_emitting_wrapper(*args, **kwargs)
+    179     warned = True
+    180     emit_warning()
+--> 181 return wrapped(*args, **kwargs)
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/langchain_core/retrievers.py:410, in BaseRetriever.get_relevant_documents(self, query, callbacks, tags, metadata, run_name, **kwargs)
+    408 if run_name:
+    409     config["run_name"] = run_name
+--> 410 return self.invoke(query, config, **kwargs)
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/langchain_core/retrievers.py:259, in BaseRetriever.invoke(self, input, config, **kwargs)
+    257 _kwargs = kwargs if self._expects_other_args else {}
+    258 if self._new_arg_supported:
+--> 259     result = self._get_relevant_documents(
+    260         input, run_manager=run_manager, **_kwargs
+    261     )
+    262 else:
+    263     result = self._get_relevant_documents(input, **_kwargs)
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/langchain/retrievers/self_query/base.py:301, in SelfQueryRetriever._get_relevant_documents(self, query, run_manager)
+    290 def _get_relevant_documents(
+    291     self, query: str, *, run_manager: CallbackManagerForRetrieverRun
+    292 ) -> List[Document]:
+    293     """Get documents relevant for a query.
+    294 
+    295     Args:
+   (...)
+    299         List of relevant documents
+    300     """
+--> 301     structured_query = self.query_constructor.invoke(
+    302         {"query": query}, config={"callbacks": run_manager.get_child()}
+    303     )
+    304     if self.verbose:
+    305         logger.info(f"Generated Query: {structured_query}")
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/langchain_core/runnables/base.py:5360, in RunnableBindingBase.invoke(self, input, config, **kwargs)
+   5354 def invoke(
+   5355     self,
+   5356     input: Input,
+   5357     config: Optional[RunnableConfig] = None,
+   5358     **kwargs: Optional[Any],
+   5359 ) -> Output:
+-> 5360     return self.bound.invoke(
+   5361         input,
+   5362         self._merge_configs(config),
+   5363         **{**self.kwargs, **kwargs},
+   5364     )
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/langchain_core/runnables/base.py:3024, in RunnableSequence.invoke(self, input, config, **kwargs)
+   3022             input = context.run(step.invoke, input, config, **kwargs)
+   3023         else:
+-> 3024             input = context.run(step.invoke, input, config)
+   3025 # finish the root run
+   3026 except BaseException as e:
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/langchain_core/output_parsers/base.py:202, in BaseOutputParser.invoke(self, input, config, **kwargs)
+    193     return self._call_with_config(
+    194         lambda inner_input: self.parse_result(
+    195             [ChatGeneration(message=inner_input)]
+   (...)
+    199         run_type="parser",
+    200     )
+    201 else:
+--> 202     return self._call_with_config(
+    203         lambda inner_input: self.parse_result([Generation(text=inner_input)]),
+    204         input,
+    205         config,
+    206         run_type="parser",
+    207     )
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/langchain_core/runnables/base.py:1922, in Runnable._call_with_config(self, func, input, config, run_type, serialized, **kwargs)
+   1918     context = copy_context()
+   1919     context.run(_set_config_context, child_config)
+   1920     output = cast(
+   1921         Output,
+-> 1922         context.run(
+   1923             call_func_with_variable_args,  # type: ignore[arg-type]
+   1924             func,  # type: ignore[arg-type]
+   1925             input,  # type: ignore[arg-type]
+   1926             config,
+   1927             run_manager,
+   1928             **kwargs,
+   1929         ),
+   1930     )
+   1931 except BaseException as e:
+   1932     run_manager.on_chain_error(e)
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/langchain_core/runnables/config.py:396, in call_func_with_variable_args(func, input, config, run_manager, **kwargs)
+    394 if run_manager is not None and accepts_run_manager(func):
+    395     kwargs["run_manager"] = run_manager
+--> 396 return func(input, **kwargs)
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/langchain_core/output_parsers/base.py:203, in BaseOutputParser.invoke.<locals>.<lambda>(inner_input)
+    193     return self._call_with_config(
+    194         lambda inner_input: self.parse_result(
+    195             [ChatGeneration(message=inner_input)]
+   (...)
+    199         run_type="parser",
+    200     )
+    201 else:
+    202     return self._call_with_config(
+--> 203         lambda inner_input: self.parse_result([Generation(text=inner_input)]),
+    204         input,
+    205         config,
+    206         run_type="parser",
+    207     )
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/langchain_core/output_parsers/base.py:247, in BaseOutputParser.parse_result(self, result, partial)
+    232 def parse_result(self, result: list[Generation], *, partial: bool = False) -> T:
+    233     """Parse a list of candidate model Generations into a specific format.
+    234 
+    235     The return value is parsed from only the first Generation in the result, which
+   (...)
+    245         Structured output.
+    246     """
+--> 247     return self.parse(result[0].text)
+
+File /opt/anaconda3/envs/Llama/lib/python3.11/site-packages/langchain/chains/query_constructor/base.py:65, in StructuredQueryOutputParser.parse(self, text)
+     61     return StructuredQuery(
+     62         **{k: v for k, v in parsed.items() if k in allowed_keys}
+     63     )
+     64 except Exception as e:
+---> 65     raise OutputParserException(
+     66         f"Parsing text\n{text}\n raised following error:\n{e}"
+     67     )
+
+OutputParserException: Parsing text
+```json
+{
+    "query": "projects",
+    "filter": "eq(\"source\", \"/Users/reem/Desktop/Langchain_tutorials/covered topics.pdf\") and eq(\"page\", 3)"
+}
+```
+ raised following error:
+Unexpected token Token('CNAME', 'and') at line 1, column 76.
+Expected one of: 
+	* $END
+Previous tokens: [Token('RPAR', ')')]
+
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/OUTPUT_PARSING_FAILURE
